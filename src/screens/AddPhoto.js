@@ -45,7 +45,7 @@ class AddPhoto extends Component {
             
         } catch (err) {
             showError(err)
-        }
+        } 
 
         this.voltar()
     }
