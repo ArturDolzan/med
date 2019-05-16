@@ -60,7 +60,7 @@ class AddPhoto extends Component {
             
             const url = 'data:image/jpg;base64,' + res.data[0].image_url
 
-            this.setState({image: {uri: url, base64: res.data[0].image_url}})
+            this.setState({image: {uri: url, base64: res.data[0].image_url}}) 
   
         } catch (err) {
             showError(err)
