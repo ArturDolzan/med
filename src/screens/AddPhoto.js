@@ -50,7 +50,7 @@ class AddPhoto extends Component {
         this.voltar()
     }
 
-    voltar = () => {
+    voltar = () => { 
         this.props.navigation.navigate('Home')
     }
 
