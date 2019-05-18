@@ -55,13 +55,12 @@ export default props => {
     animValue = new Animated.Value(0)
 
     Animated.loop(
-        // Animation consists of a sequence of steps
         Animated.sequence([
-          // start rotation in one direction (only half the time is needed)
+         
           Animated.timing(animValue, {toValue: 1.0, duration: 150, easing: Easing.linear, useNativeDriver: true}),
-          // rotate in other direction, to minimum value (= twice the duration of above)
+        
           Animated.timing(animValue, {toValue: -1.0, duration: 300, easing: Easing.linear, useNativeDriver: true}),
-          // return to begin position
+       
           Animated.timing(animValue, {toValue: 0.0, duration: 150, easing: Easing.linear, useNativeDriver: true})
         ])
       ).start(); 
