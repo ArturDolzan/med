@@ -14,11 +14,30 @@ import ImagePicker from 'react-native-image-picker'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import axios from 'axios';
 import { server, showError } from '../common';
+import Loading from '../components/Loading';
 
 class AddPhoto extends Component {
     state = {
-        image: null
+        image: null,
+        isLoading: false
     }
+
+     AsyncAlert = async () => new Promise((resolve) => {
+        Alert.alert(
+          'Imagem',
+          'Foto salva com sucesso!',
+          [
+            {
+              text: 'Ok',
+              onPress: () => {
+                resolve('YES');
+                this.voltar()
+              },
+            },
+          ],
+          { cancelable: false },
+        );
+      });
 
     pickImage = () => {
         ImagePicker.showImagePicker({
@@ -37,17 +56,19 @@ class AddPhoto extends Component {
         const image = this.state.image.base64
 
         try {
+            this.setState({isLoading: true})
+
             await axios.post(`${server}/tasks/${this.props.navigation.getParam('id')}/uploadPhoto/`, {
                 photo: image
             })
 
-            Alert.alert('Imagem', 'Foto salva com sucesso!')
+            this.setState({isLoading: false})
+
+            this.AsyncAlert()
             
         } catch (err) {
             showError(err)
         } 
-
-        this.voltar()
     }
 
     voltar = () => { 
@@ -56,9 +77,13 @@ class AddPhoto extends Component {
 
     loadPhoto = async () => {
         try {
+            this.setState({isLoading: true})
+
             const res = await axios.get(`${server}/tasks/${this.props.navigation.getParam('id')}/downloadPhoto/`)
             
             const url = 'data:image/jpg;base64,' + res.data[0].image_url
+
+            this.setState({isLoading: false})
 
             this.setState({image: {uri: url, base64: res.data[0].image_url}}) 
   
@@ -78,26 +103,25 @@ class AddPhoto extends Component {
                 <View style={styles.titleContainer}>
 
                     <TouchableOpacity onPress={this.voltar} >
-
                         <Icon name='arrow-left' size={20} color='#888'></Icon>
                     </TouchableOpacity>
 
                     <Text style={styles.title}>
                         Foto ReMed
                     </Text>
+
+                    <TouchableOpacity onPress={this.pickImage} >
+                        <Icon name='camera' size={25} color='green' style={{paddingTop: 3}}></Icon>
+                    </TouchableOpacity> 
                 </View>
 
                 <View style={styles.container}>
 
-                    <View style={styles.imageContainer}>
+                    <View style={styles.imageContainer}>   
                         <Image source={this.state.image} style={styles.image}>
-
+                            
                         </Image>
                     </View>
-
-                    <TouchableOpacity onPress={this.pickImage} style={styles.buttom}>
-                        <Icon name='camera' size={40} color='green'></Icon>
-                    </TouchableOpacity>
 
                     <View style={styles.botContainer}>
                         <TouchableOpacity onPress={this.save}  
@@ -107,9 +131,14 @@ class AddPhoto extends Component {
                         </TouchableOpacity>
 
                     </View>
-                    
 
                 </View>
+                {this.state.isLoading ? 
+                    <View style={styles.containerLoading}>
+                        <Loading/>
+                    </View>
+                    : null
+                }
             </ScrollView>
         )
     }
@@ -121,11 +150,29 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
 
+    containerLoading: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    cam: {
+        position: 'absolute',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+
     titleContainer: {
-        marginTop: Platform.OS === 'ios' ? 30 : 10,
+        marginTop: Platform.OS === 'ios' ? 35 : 15,
         marginHorizontal: 20,
         flexDirection: 'row',
-        justifyContent: 'flex-start'
+        justifyContent: 'space-around',
+        marginBottom: 15
     },
 
     botContainer: {
@@ -136,19 +183,19 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: 'bold',
-        marginLeft: 30
+        color: '#000'
     },
 
     imageContainer: {
         width: '90%',
-        height: Dimensions.get('window').width * 3 /4,
+        height: Dimensions.get('window').width * 3 /3.2,
         backgroundColor: '#EEE',
         marginTop: 10
     },
 
     image: {
         width: '100%',
-        height: Dimensions.get('window').width * 3 / 4,
+        height: Dimensions.get('window').width * 3 / 3.2,
         resizeMode: 'center'
     },
 

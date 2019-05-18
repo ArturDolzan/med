@@ -1,11 +1,12 @@
 import React from 'react'
-import {StyleSheet, Text, View, TouchableWithoutFeedback, TouchableOpacity, Image, Animated, Easing} from 'react-native'
+import {StyleSheet, Text, View, TouchableWithoutFeedback, TouchableOpacity, Image} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import moment from 'moment'
 import 'moment/locale/pt-br'
 import commonStyles from '../commonStyles';
 import Swipeable from 'react-native-swipeable'
 import cam from '../../assets/imgs/cam.png'
+import Loading from './Loading';
 
 export default props => {
     let check = null
@@ -44,26 +45,12 @@ export default props => {
     ]
 
     let photo = {uri: props.image_url, base64: props.image_base}
-    let ang = '0deg'
 
     if (!photo.uri) {
         photo = cam
-    } else {
-        ang = '360deg'
     }
 
-    animValue = new Animated.Value(0)
-
-    Animated.loop(
-        Animated.sequence([
-         
-          Animated.timing(animValue, {toValue: 1.0, duration: 150, easing: Easing.linear, useNativeDriver: true}),
-        
-          Animated.timing(animValue, {toValue: -1.0, duration: 300, easing: Easing.linear, useNativeDriver: true}),
-       
-          Animated.timing(animValue, {toValue: 0.0, duration: 150, easing: Easing.linear, useNativeDriver: true})
-        ])
-      ).start(); 
+    let isLoading = props.loading || false
     
     return (
         <Swipeable leftActionActivationDistance={200} 
@@ -83,14 +70,17 @@ export default props => {
                 </View>
                 <View style={styles.photo}>
                     <TouchableOpacity onPress={() => props.onPhoto(props.id)}>
-                        <Animated.Image source={photo} style={[styles.imageContainer, {transform: [{
-                            rotate: animValue.interpolate({
-                                inputRange: [-1, 1],
-                                outputRange: ['-0.1rad', '0.1rad']
-                            })
-                            }] }]}>
-
-                        </Animated.Image>
+                        <Image source={photo} style={styles.imageContainer}>
+                         
+                        </Image>
+                        {isLoading ? 
+                            <View style={styles.loading}>
+                                <Loading size='small'/>
+                            </View>
+                            :
+                            null
+                        }
+                        
                     </TouchableOpacity>
                     
                 </View>
@@ -108,12 +98,18 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
 
+    loading: {
+        position: 'absolute',
+        paddingTop: 20,
+        paddingLeft: 20
+    },
+
     imageContainer: {
         width: 60,
         height: 60,
         borderWidth: 2,
         borderColor: '#AAA',
-        borderRadius: 30,
+        borderRadius: 30
     },
 
     container1: {

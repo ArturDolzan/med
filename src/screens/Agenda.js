@@ -13,6 +13,7 @@ import { server, showError } from '../common';
 import tomorrowImage from '../../assets/imgs/today.jpg'
 import weekImage from '../../assets/imgs/today.jpg'
 import monthImage from '../../assets/imgs/today.jpg'
+import Loading from '../components/Loading';
 
 
 export default class Agenda extends Component {
@@ -25,7 +26,9 @@ export default class Agenda extends Component {
         images: [],
 
         showDoneTasks: true,
-        showAddTask: false
+        showAddTask: false,
+        isLoading: false,
+        isLoadingImg: false
     }
 
     addTask = async task => {
@@ -74,7 +77,7 @@ export default class Agenda extends Component {
             item.image_base = url
         })
 
-        this.setState({visibleTasks})
+        this.setState({visibleTasks, isLoading: false})
     }
 
     processImages = () => {
@@ -99,7 +102,7 @@ export default class Agenda extends Component {
                         id: item.id
                     })
 
-                    this.setState({images})
+                    this.setState({images, isLoadingImg: false})
 
                     return ret
         
@@ -138,6 +141,8 @@ export default class Agenda extends Component {
             const maxDate = moment()
                 .add({days: this.props.daysAhead})
                 .format('YYYY-MM-DD 23:59')
+
+            this.setState({isLoading: true, isLoadingImg: true})    
 
             const res = await axios.get(`${server}/tasks?date=${maxDate}`)
 
@@ -212,12 +217,22 @@ export default class Agenda extends Component {
                 
                     <FlatList data={this.state.visibleTasks} 
                         keyExtractor={item => `${item.id}`}  
-                        renderItem={({item}) => <Tasks {...item} toggleTask={this.toggleTask} onDelete={this.deleteTask} onPhoto={this.photo}/> } />
+                        renderItem={({item}) => <Tasks {...item} 
+                            toggleTask={this.toggleTask} onDelete={this.deleteTask} 
+                            onPhoto={this.photo} loading={this.state.isLoadingImg} /> } />
                 
                 </View>
                 <ActionButton buttonColor={styleColor} onPress={() => this.setState({showAddTask: true})}>
 
                 </ActionButton>
+                
+                {this.state.isLoading ? 
+                    <View style={styles.containerLoading}>
+                        <Loading/>
+                    </View>
+                    : null
+                }
+                
             </View>
         )
     }
@@ -226,6 +241,15 @@ export default class Agenda extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1
+    },
+    containerLoading: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     background: {
         flex: 3
