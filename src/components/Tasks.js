@@ -1,10 +1,11 @@
 import React from 'react'
-import {StyleSheet, Text, View, TouchableWithoutFeedback, TouchableOpacity, Alert} from 'react-native'
+import {StyleSheet, Text, View, TouchableWithoutFeedback, TouchableOpacity, Image} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import moment from 'moment'
 import 'moment/locale/pt-br'
 import commonStyles from '../commonStyles';
 import Swipeable from 'react-native-swipeable'
+import cam from '../../assets/imgs/cam.png'
 
 export default props => {
     let check = null
@@ -42,6 +43,12 @@ export default props => {
         </TouchableOpacity>
     ]
 
+    let photo = {uri: props.image_url, base64: props.image_base}
+
+    if (!photo.uri) {
+        photo = cam
+    }
+
     return (
         <Swipeable leftActionActivationDistance={200} 
             onLeftActionActivate={() => props.onDelete(props.id)}
@@ -53,15 +60,18 @@ export default props => {
                             {check}
                         </View>
                     </TouchableWithoutFeedback>
-                    <View>
+                    <View style={{paddingLeft: 5, paddingTop: 10}}>
                         <Text style={[styles.description, descStyle]}>{props.desc}</Text>
                         <Text style={styles.date}>{moment(props.estimateAt).locale('pt-br').format('ddd, D [de] MMMM [de] YYYY')}</Text>
                     </View>
                 </View>
                 <View style={styles.photo}>
                     <TouchableOpacity onPress={() => props.onPhoto(props.id)}>
-                        <Icon name='camera' size={25} color='red'></Icon>
+                        <Image source={photo} style={styles.imageContainer} >
+
+                        </Image>
                     </TouchableOpacity>
+                    
                 </View>
             </View>
         </Swipeable>
@@ -75,6 +85,14 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor : '#AAA',
         justifyContent: 'space-between'
+    },
+
+    imageContainer: {
+        width: 60,
+        height: 60,
+        borderWidth: 2,
+        borderColor: '#AAA',
+        borderRadius: 30,
     },
 
     container1: {
@@ -97,15 +115,15 @@ const styles = StyleSheet.create({
 
     pending: {
         borderWidth: 1,
-        height: 25,
-        width: 25,
+        height: 30,
+        width: 30,
         borderRadius: 15,
         borderColor: '#555'
     },
 
     done: {
-        height: 25,
-        width: 25,
+        height: 30,
+        width: 30,
         borderRadius: 15,
         backgroundColor: '#4d7031',
         alignItems: 'center',

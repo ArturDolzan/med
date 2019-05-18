@@ -20,9 +20,9 @@ export default class Agenda extends Component {
     state = {
         tasks: [],
 
-        visibleTasks: [
+        visibleTasks: [],
 
-        ],
+        images: [],
 
         showDoneTasks: true,
         showAddTask: false
@@ -59,8 +59,60 @@ export default class Agenda extends Component {
             visibleTasks = this.state.tasks.filter(task => task.doneAt === null)
         }
 
-        this.setState({visibleTasks})
+        let images = [...this.state.images]
 
+        visibleTasks.map((item, idx) => {
+
+            let uri = images.filter(x => x.id === item.id)
+            let url = null
+
+            if (uri.length > 0) {
+                url = uri[0].image_uri
+            }
+
+            item.image_url = url
+            item.image_base = url
+        })
+
+        this.setState({visibleTasks})
+    }
+
+    processImages = () => {
+        let tasksMan = [...this.state.tasks]
+        let images = []
+
+        if (tasksMan.length > 0) {
+
+            const promises = tasksMan.map(async (item, idx) => {
+
+                try {
+                    const res = await axios.get(`${server}/tasks/${item.id}/downloadPhoto/`)
+                    
+                    let url = null
+
+                    if (res.data[0].image_url) {
+                        url = 'data:image/jpg;base64,' + res.data[0].image_url
+                    }
+
+                    var ret = images.push({
+                        image_uri: url,
+                        id: item.id
+                    })
+
+                    this.setState({images})
+
+                    return ret
+        
+                } catch (err) {
+                    showError(err)
+                }
+            })
+    
+            return Promise.all(promises)
+                    .then(_ => {
+                        this.filterTasks()
+                    });
+        }   
     }
 
     toggleFilter = () => {
@@ -89,7 +141,10 @@ export default class Agenda extends Component {
 
             const res = await axios.get(`${server}/tasks?date=${maxDate}`)
 
-            this.setState({tasks: res.data}, this.filterTasks)
+            this.setState({tasks: res.data}, () => {
+                this.processImages()
+                this.filterTasks()
+            })
 
         } catch (err) {
             showError(err)
