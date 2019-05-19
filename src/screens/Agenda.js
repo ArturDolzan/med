@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {StyleSheet, Text, View, ImageBackground, FlatList, TouchableOpacity, Platform} from 'react-native'
 import moment from 'moment'
 import 'moment/locale/pt-br'
-import todayImage from '../../assets/imgs/today.jpg'
+import todayImage from '../../assets/imgs/today.png'
 import commonStyles from '../commonStyles';
 import Tasks from '../components/Tasks';
 import Icon from 'react-native-vector-icons/FontAwesome'
@@ -10,9 +10,9 @@ import ActionButton from 'react-native-action-button'
 import AddTask from './AddTask';
 import axios from 'axios';
 import { server, showError } from '../common';
-import tomorrowImage from '../../assets/imgs/today.jpg'
-import weekImage from '../../assets/imgs/today.jpg'
-import monthImage from '../../assets/imgs/today.jpg'
+import tomorrowImage from '../../assets/imgs/tomorrow.png'
+import weekImage from '../../assets/imgs/week.png'
+import monthImage from '../../assets/imgs/month.png'
 import Loading from '../components/Loading';
 
 
