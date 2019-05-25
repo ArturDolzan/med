@@ -6,8 +6,10 @@ import AuthInput from '../components/AuthInput';
 import axios from 'axios';
 import { server, showError } from '../common';
 import AsyncStorage from '@react-native-community/async-storage'
+import {connect} from 'react-redux'
+import {login} from '../store/actions/user'
 
-export default class Auth extends Component {
+class Auth extends Component {
     state = {
         stageNew: false,
         nome: '',
@@ -27,6 +29,8 @@ export default class Auth extends Component {
             axios.defaults.headers.common['Authorization'] = `bearer ${res.data.token}`
 
             await AsyncStorage.setItem('userData', JSON.stringify(res.data))
+
+            this.login(res.data)
 
             this.props.navigation.navigate('Home', res.data)
 
@@ -57,6 +61,10 @@ export default class Auth extends Component {
         } else {
             this.signin()
         }
+    }
+
+    login = (user) => {
+        this.props.onLogin(user)
     }
 
     render() {
@@ -158,3 +166,13 @@ const styles = StyleSheet.create({
         fontSize: 20
     }
 })
+
+
+const mapDispatchToProps = dispatch => {
+    return {
+        onLogin: user => dispatch(login(user))
+    }
+}
+
+//export default
+export default connect(null, mapDispatchToProps)(Auth)

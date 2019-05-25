@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Component} from 'react'
 import {StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native'
 import {Gravatar} from 'react-native-gravatar'
 import { DrawerItems } from 'react-navigation';
@@ -6,51 +6,55 @@ import commonStyles from '../commonStyles';
 import AsyncStorage from '@react-native-community/async-storage'
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome'
+import {connect} from 'react-redux'
 
-export default props => {
+class Menu extends Component {
 
-    const logout = async () => {
+    logout = async () => {
         delete axios.defaults.headers.common['Authorization']
 
         await AsyncStorage.removeItem('userData')
 
-        props.navigation.navigate('Loading')
+        this.props.navigation.navigate('Loading')
     }
 
-    return (
-        <ScrollView>
-            <View style={styles.header}>
-                <Text style={styles.title}>
-                    Tasks
-                </Text>
+    render() {
+        return (
+            <ScrollView>
+                <View style={styles.header}>
+                    <Text style={styles.title}>
+                        Tasks
+                    </Text>
 
-                <Gravatar style={styles.avatar} options={{
-                        email: props.navigation.getParam('email'),
-                        secure: true
-                    }}>
+                    <Gravatar style={styles.avatar} options={{
+                            email: this.props.email,
+                            secure: true
+                        }}>
 
-                </Gravatar>
+                    </Gravatar>
 
-                <View style={styles.userInfo}>
-                    <View>
-                        <Text style={styles.name}>
-                            {props.navigation.getParam('name')}
-                        </Text>
+                    <View style={styles.userInfo}>
+                        <View>
+                            <Text style={styles.name}>
+                                {this.props.name}
+                            </Text>
 
-                        <Text style={styles.email}>
-                            {props.navigation.getParam('email')}
-                        </Text>
+                            <Text style={styles.email}>
+                                {this.props.email}
+                            </Text>
+                        </View>
                     </View>
+                    <TouchableOpacity onPress={this.logout}>
+                        <View style={styles.logoutIcon}>
+                            <Icon name='sign-out' size={30} color='#800'></Icon>
+                        </View>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={logout}>
-                    <View style={styles.logoutIcon}>
-                        <Icon name='sign-out' size={30} color='#800'></Icon>
-                    </View>
-                </TouchableOpacity>
-            </View>
-            <DrawerItems {...props}></DrawerItems>
-        </ScrollView>
-    )
+                <DrawerItems {...this.props}></DrawerItems>
+            </ScrollView>
+        ) 
+    }
+        
 }
 
 const styles = StyleSheet.create({
@@ -101,3 +105,14 @@ const styles = StyleSheet.create({
         marginRight: 10
     }
 })
+
+const mapStateToProps = ({user}) => {
+    
+    return {
+        email: user.email,
+        name: user.name
+    }
+}
+
+//export default
+export default connect(mapStateToProps, null)(Menu)

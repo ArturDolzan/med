@@ -8,152 +8,44 @@ import Tasks from '../components/Tasks';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import ActionButton from 'react-native-action-button'
 import AddTask from './AddTask';
-import axios from 'axios';
-import { server, showError } from '../common';
 import tomorrowImage from '../../assets/imgs/tomorrow.png'
 import weekImage from '../../assets/imgs/week.png'
 import monthImage from '../../assets/imgs/month.png'
 import Loading from '../components/Loading';
+import {connect} from 'react-redux'
+import {actionLoadTasks, 
+    actionToggleFilter, 
+    actionToggleAddTask,
+    actionAddTask,
+    actionToggleTask,
+    actionDeleteTask
+} from '../store/actions/tasks'
 
 
-export default class Agenda extends Component {
+class Agenda extends Component {
 
-    state = {
-        tasks: [],
-
-        visibleTasks: [],
-
-        images: [],
-
-        showDoneTasks: true,
-        showAddTask: false,
-        isLoading: false,
-        isLoadingImg: false
+    addTask =  task => {
+        this.props.onAddTask(task, this.props.daysAhead)
     }
 
-    addTask = async task => {
-        try {
-            await axios.post(`${server}/tasks`, {
-                desc: task.desc,
-                estimateAt: task.date
-            })
-
-            this.setState({showAddTask: false}, () => this.loadTasks())
-        } catch (err) {
-            showError(err)
-        }
-    }
-
-    deleteTask = async id => {
-        try {
-            await axios.delete(`${server}/tasks/${id}`)
-            await this.loadTasks()
-        } catch (err) {
-            showError(err)
-        }
-    }
-
-    filterTasks = () => {
-        let visibleTasks = null
-
-        if(this.state.showDoneTasks) {
-            visibleTasks = [...this.state.tasks]
-        } else {
-            visibleTasks = this.state.tasks.filter(task => task.doneAt === null)
-        }
-
-        let images = [...this.state.images]
-
-        visibleTasks.map((item, idx) => {
-
-            let uri = images.filter(x => x.id === item.id)
-            let url = null
-
-            if (uri.length > 0) {
-                url = uri[0].image_uri
-            }
-
-            item.image_url = url
-            item.image_base = url
-        })
-
-        this.setState({visibleTasks, isLoading: false})
-    }
-
-    processImages = () => {
-        let tasksMan = [...this.state.tasks]
-        let images = []
-
-        if (tasksMan.length > 0) {
-
-            const promises = tasksMan.map(async (item, idx) => {
-
-                try {
-                    const res = await axios.get(`${server}/tasks/${item.id}/downloadPhoto/`)
-                    
-                    let url = null
-
-                    if (res.data[0].image_url) {
-                        url = 'data:image/jpg;base64,' + res.data[0].image_url
-                    }
-
-                    var ret = images.push({
-                        image_uri: url,
-                        id: item.id
-                    })
-
-                    this.setState({images, isLoadingImg: false})
-
-                    return ret
-        
-                } catch (err) {
-                    showError(err)
-                }
-            })
-    
-            return Promise.all(promises)
-                    .then(_ => {
-                        this.filterTasks()
-                    });
-        }   
+    deleteTask = id => {
+        this.props.onDeleteTask(id, this.props.daysAhead)
     }
 
     toggleFilter = () => {
-        this.setState({showDoneTasks: !this.state.showDoneTasks})
-        this.loadTasks()
+        this.props.onToggleFilter(this.props.daysAhead)
     }
 
     componentDidMount = () => {
-        this.loadTasks()
+        this.props.onLoadTasks(this.props.daysAhead, this.props.tasks.showDoneTasks)
     }
 
-    toggleTask = async id => {
-        try {
-            await axios.put(`${server}/tasks/${id}/toggle`)
-            await this.loadTasks()
-        } catch (err) {
-            showError(err)
-        }
+    toggleAddTask = (showAddTask) => {
+        this.props.onToggleAddTask(showAddTask)
     }
 
-    loadTasks = async () => {
-        try {
-            const maxDate = moment()
-                .add({days: this.props.daysAhead})
-                .format('YYYY-MM-DD 23:59')
-
-            this.setState({isLoading: true, isLoadingImg: true})    
-
-            const res = await axios.get(`${server}/tasks?date=${maxDate}`)
-
-            this.setState({tasks: res.data}, () => {
-                this.processImages()
-                this.filterTasks()
-            })
-
-        } catch (err) {
-            showError(err)
-        }
+    toggleTask = id => {
+        this.props.onToggleTask(id, this.props.daysAhead)
     }
 
     photo = id => {
@@ -186,9 +78,9 @@ export default class Agenda extends Component {
 
         return (
             <View style={styles.container}>
-                <AddTask isVisible={this.state.showAddTask} 
+                <AddTask isVisible={this.props.tasks.showAddTask} 
                     onSave={this.addTask} 
-                    onCancel={() => this.setState({showAddTask: false})}>
+                    onCancel={() => this.toggleAddTask(false)}>
                 </AddTask>
                 <ImageBackground source={image} style={styles.background}>
                     <View style={styles.iconBar}>
@@ -198,8 +90,8 @@ export default class Agenda extends Component {
                             </Icon>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={this.toggleFilter}>
-                            <Icon name={this.state.showDoneTasks ? 'filter' : 'filter'} size={30}
-                            color={this.state.showDoneTasks ? commonStyles.colors.secondary : 'red'} />
+                            <Icon name={this.props.tasks.showDoneTasks ? 'filter' : 'filter'} size={30}
+                            color={this.props.tasks.showDoneTasks ? commonStyles.colors.secondary : 'red'} />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.titleBar}>
@@ -215,18 +107,18 @@ export default class Agenda extends Component {
 
                 <View style={styles.taskContainer}>
                 
-                    <FlatList data={this.state.visibleTasks} 
+                    <FlatList data={this.props.tasks.visibleTasks} 
                         keyExtractor={item => `${item.id}`}  
                         renderItem={({item}) => <Tasks {...item} 
                             toggleTask={this.toggleTask} onDelete={this.deleteTask} 
-                            onPhoto={this.photo} loading={this.state.isLoadingImg} /> } />
+                            onPhoto={this.photo} loading={this.props.tasks.isLoadingImg} /> } />
                 
                 </View>
-                <ActionButton buttonColor={styleColor} onPress={() => this.setState({showAddTask: true})}>
+                <ActionButton buttonColor={styleColor} onPress={() => this.toggleAddTask(true)}>
 
                 </ActionButton>
                 
-                {this.state.isLoading ? 
+                {this.props.tasks.isLoading ? 
                     <View style={styles.containerLoading}>
                         <Loading/>
                     </View>
@@ -282,3 +174,29 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     }
 })
+
+const mapStateToProps = (data) => {
+    
+    return {
+        tasks: data.tasks,
+        visibleTasks: data.visibleTasks,
+        showDoneTasks: data.tasks.showDoneTasks,
+        showAddTask: data.tasks.showAddTask,
+        isLoading: data.tasks.isLoading,
+        isLoadingImg: data.tasks.isLoadingImg
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        onLoadTasks: (daysAhead, showDoneTasks) => dispatch(actionLoadTasks(daysAhead, showDoneTasks)),
+        onToggleFilter: (daysAhead) => dispatch(actionToggleFilter(daysAhead)),
+        onToggleAddTask: (showAddTask) => dispatch(actionToggleAddTask(showAddTask)),
+        onAddTask: (task, daysAhead) => dispatch(actionAddTask(task, daysAhead)),
+        onToggleTask: (id, daysAhead) => dispatch(actionToggleTask(id, daysAhead)),
+        onDeleteTask: (id, daysAhead) => dispatch(actionDeleteTask(id, daysAhead))
+    }
+}
+
+//export default
+export default connect(mapStateToProps, mapDispatchToProps)(Agenda)
