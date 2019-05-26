@@ -97,7 +97,7 @@ export const actionDeleteTask = (id, daysAhead) => {
 
 export const actionLoadTasks = (daysAhead, showDoneTasks) => {
     return (dispatch) => {
-      
+      //console.log(daysAhead)
         const maxDate = moment()
             .add({days: daysAhead})
             .format('YYYY-MM-DD 23:59')

@@ -21,8 +21,21 @@ import {actionLoadTasks,
     actionDeleteTask
 } from '../store/actions/tasks'
 
-
 class Agenda extends Component {
+
+    componentDidMount = () => {
+        this.focusListener = this.props.navigation.addListener('didFocus', () => {
+            this.onFocusFunction()
+        })
+    }
+
+    onFocusFunction = () => {
+        this.props.onLoadTasks(this.props.daysAhead, this.props.tasks.showDoneTasks)
+    }
+
+    componentWillUnmount () {
+        this.focusListener.remove()
+    }
 
     addTask =  task => {
         this.props.onAddTask(task, this.props.daysAhead)
@@ -34,10 +47,6 @@ class Agenda extends Component {
 
     toggleFilter = () => {
         this.props.onToggleFilter(this.props.daysAhead)
-    }
-
-    componentDidMount = () => {
-        this.props.onLoadTasks(this.props.daysAhead, this.props.tasks.showDoneTasks)
     }
 
     toggleAddTask = (showAddTask) => {
@@ -85,12 +94,12 @@ class Agenda extends Component {
                 <ImageBackground source={image} style={styles.background}>
                     <View style={styles.iconBar}>
                         <TouchableOpacity onPress={() => this.props.navigation.openDrawer()}>
-                            <Icon name='bars' size={30} color={commonStyles.colors.secondary}>
+                            <Icon name='bars' size={25} color={commonStyles.colors.secondary}>
 
                             </Icon>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={this.toggleFilter}>
-                            <Icon name={this.props.tasks.showDoneTasks ? 'filter' : 'filter'} size={30}
+                            <Icon name={this.props.tasks.showDoneTasks ? 'filter' : 'filter'} size={25}
                             color={this.props.tasks.showDoneTasks ? commonStyles.colors.secondary : 'red'} />
                         </TouchableOpacity>
                     </View>
@@ -153,7 +162,7 @@ const styles = StyleSheet.create({
     title: {
         fontFamily: commonStyles.fontFamily,
         color: commonStyles.colors.secondary,
-        fontSize: 50,
+        fontSize: 45,
         marginLeft: 20,
         marginBottom: 10
     },

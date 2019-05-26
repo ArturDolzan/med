@@ -14,12 +14,13 @@ import ImagePicker from 'react-native-image-picker'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import axios from 'axios';
 import { server, showError } from '../common';
-import Loading from '../components/Loading';
+import Loading from '../components/Loading'
 
 class AddPhoto extends Component {
     state = {
         image: null,
-        isLoading: false
+        isLoading: false,
+        newPhoto: false
     }
 
      AsyncAlert = async () => new Promise((resolve) => {
@@ -46,7 +47,7 @@ class AddPhoto extends Component {
             maxWidth: 800
         }, res => {
             if(!res.didCancel){
-                this.setState({image: {uri: res.uri, base64: res.data}})
+                this.setState({image: {uri: res.uri, base64: res.data}, newPhoto: true})
             }
         })
     }
@@ -64,7 +65,8 @@ class AddPhoto extends Component {
 
             this.setState({isLoading: false})
 
-            this.AsyncAlert()
+            this.voltar()
+            //this.AsyncAlert()
             
         } catch (err) {
             showError(err)
@@ -80,12 +82,12 @@ class AddPhoto extends Component {
             this.setState({isLoading: true})
 
             const res = await axios.get(`${server}/tasks/${this.props.navigation.getParam('id')}/downloadPhoto/`)
-            
+
+            const newPhoto = res.data[0].image_url ? true : false
+
             const url = 'data:image/jpg;base64,' + res.data[0].image_url
 
-            this.setState({isLoading: false})
-
-            this.setState({image: {uri: url, base64: res.data[0].image_url}}) 
+            this.setState({image: {uri: url, base64: res.data[0].image_url}, newPhoto, isLoading: false}) 
   
         } catch (err) {
             showError(err)
@@ -100,21 +102,6 @@ class AddPhoto extends Component {
         return (
             <ScrollView>
 
-                <View style={styles.titleContainer}>
-
-                    <TouchableOpacity onPress={this.voltar} >
-                        <Icon name='arrow-left' size={20} color='#888'></Icon>
-                    </TouchableOpacity>
-
-                    <Text style={styles.title}>
-                        Foto ReMed
-                    </Text>
-
-                    <TouchableOpacity onPress={this.pickImage} >
-                        <Icon name='camera' size={25} color='green' style={{paddingTop: 3}}></Icon>
-                    </TouchableOpacity> 
-                </View>
-
                 <View style={styles.container}>
 
                     <View style={styles.imageContainer}>   
@@ -124,11 +111,19 @@ class AddPhoto extends Component {
                     </View>
 
                     <View style={styles.botContainer}>
-                        <TouchableOpacity onPress={this.save}  
-                            disabled={this.state.image === null ? true : false} style={styles.buttom}>
-                            
-                            <Icon name='save' size={40} color='black'></Icon>
-                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={this.pickImage} style={styles.buttom}>
+                            <Icon name='camera' size={40} color='red' ></Icon>
+                        </TouchableOpacity> 
+
+                        {this.state.newPhoto ? 
+                            <TouchableOpacity onPress={this.save} style={styles.buttom}>
+                                
+                                <Icon name='check' size={40} color='green'></Icon>
+                            </TouchableOpacity>
+                        : 
+                            null
+                        }
 
                     </View>
 

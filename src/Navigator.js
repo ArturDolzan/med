@@ -1,38 +1,40 @@
 import React from 'react'
-import {createSwitchNavigator, createAppContainer, createDrawerNavigator} from 'react-navigation'
+import {createSwitchNavigator, createAppContainer, createDrawerNavigator, 
+    createStackNavigator, createBottomTabNavigator} from 'react-navigation'
 import Agenda from './screens/Agenda';
 import Auth from './screens/Auth';
 import commonStyles from './commonStyles';
 import Menu from './screens/Menu';
 import AuthOrApp from './screens/AuthOrApp';
 import AddPhoto from './screens/AddPhoto';
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 
 const MenuRoutes = {
     Today: {
         name: 'Today',
-        screen: props => <Agenda title='Hoje' daysAhead={0} {...props}></Agenda>,
+        screen: props => <Agenda title='Hoje' {...props} daysAhead={0}></Agenda>,
         navigationOptions: {
             title: 'Hoje'
         }
     },
     Tomorrow: {
         name: 'Tomorrow',
-        screen: props => <Agenda title='Amanha' daysAhead={1} {...props}></Agenda>,
+        screen: props => <Agenda title='Amanha' {...props} daysAhead={1}></Agenda>,
         navigationOptions: {
             title: 'Amanha'
         }
     },
     Week: {
         name: 'Week',
-        screen: props => <Agenda title='Semana' daysAhead={7} {...props}></Agenda>,
+        screen: props => <Agenda title='Semana' {...props} daysAhead={7}></Agenda>,
         navigationOptions: {
             title: 'Semana'
         }
     },
     Month: {
         name: 'Month',
-        screen: props => <Agenda title='Mes' daysAhead={30} {...props}></Agenda>,
+        screen: props => <Agenda title='Mes' {...props} daysAhead={30}></Agenda>,
         navigationOptions: {
             title: 'Mes'
         }
@@ -57,6 +59,61 @@ const MenuConfig = {
 
 const menuNavigator = createDrawerNavigator(MenuRoutes, MenuConfig)
 
+const stackRoutes = {
+	Home: {
+        name: 'Home',
+        screen: menuNavigator,
+        navigationOptions: {
+            header: null,
+        }
+    },
+    AddPhoto: {
+        name: 'AddPhoto',
+        screen: props => <AddPhoto {...props}></AddPhoto>,
+    }
+}
+
+const stackNavigator = createStackNavigator(stackRoutes)
+
+const bottomRoutes = {
+    Home: {
+        name: 'Home',
+        screen: stackNavigator,
+        navigationOptions: {
+            title: 'Home',
+            tabBarIcon: ({ tintColor: color }) =>
+                <Icon name='home' size={30} color={color} />
+        }
+    },
+    Map: {
+        name: 'Map',
+        screen: Auth,
+        navigationOptions: {
+            title: 'Map',
+            tabBarIcon: ({ tintColor: color }) =>
+                <Icon name='map' size={30} color={color} />
+        }
+    },
+    WhoAmI: {
+        name: 'WhoAmI',
+        screen: Auth,
+        navigationOptions: {
+            title: 'WhoAmI',
+            tabBarIcon: ({ tintColor: color }) =>
+                <Icon name='user' size={30} color={color} />
+        }
+    }
+}
+
+const bottomConfig = {
+    initialRouteName: 'Home',
+    tabBarOptions: {
+        showLabel: false,
+    }
+}
+
+const bottomNavigator = createBottomTabNavigator(bottomRoutes, bottomConfig)
+
 const MainRoutes = {
     Loading: {
         name: 'Loading',
@@ -68,14 +125,9 @@ const MainRoutes = {
     },
     Home: {
         name: 'Home',
-        screen: menuNavigator
-    },
-    AddPhoto: {
-        name: 'AddPhoto',
-        screen: props => <AddPhoto {...props}></AddPhoto>,
+        screen: bottomNavigator
     }
 }
-
 
 
 const MainNavigator = createSwitchNavigator(MainRoutes, {initialRouteName: 'Loading'})
