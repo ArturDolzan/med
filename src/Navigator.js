@@ -8,6 +8,7 @@ import Menu from './screens/Menu';
 import AuthOrApp from './screens/AuthOrApp';
 import AddPhoto from './screens/AddPhoto';
 import Icon from 'react-native-vector-icons/FontAwesome'
+import Maps from './screens/Maps';
 
 
 const MenuRoutes = {
@@ -87,7 +88,7 @@ const bottomRoutes = {
     },
     Map: {
         name: 'Map',
-        screen: Auth,
+        screen: Maps,
         navigationOptions: {
             title: 'Map',
             tabBarIcon: ({ tintColor: color }) =>
@@ -96,7 +97,7 @@ const bottomRoutes = {
     },
     WhoAmI: {
         name: 'WhoAmI',
-        screen: Auth,
+        screen: Maps,
         navigationOptions: {
             title: 'WhoAmI',
             tabBarIcon: ({ tintColor: color }) =>
