@@ -8,23 +8,33 @@ import { server, showError } from '../common';
 import AsyncStorage from '@react-native-community/async-storage'
 import {connect} from 'react-redux'
 import {login} from '../store/actions/user'
+import Loading from '../components/Loading'
 
 class Auth extends Component {
     state = {
         stageNew: false,
         nome: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
+        email: 'artur@teste.com.br',
+        password: '1',
+        confirmPassword: '',
+        loading: false
     }
 
     signin = async () => {
         try {
 
+            this.setState({loading: true})
+
             const res = await axios.post(`${server}/signin`, {
                 email: this.state.email,
                 password: this.state.password
             })
+            
+            if(!res.data.token) {
+                this.setState({loading: false})
+                Alert.alert('Ops', 'Algo deu errado =(')
+                return
+            }
 
             axios.defaults.headers.common['Authorization'] = `bearer ${res.data.token}`
 
@@ -32,15 +42,20 @@ class Auth extends Component {
 
             this.login(res.data)
 
+            this.setState({loading: false})
+
             this.props.navigation.navigate('Home', res.data)
 
         } catch (err) {
+            this.setState({loading: false})
             showError(err)
         }
     }
 
     signup = async () => {
         try{
+            this.setState({loading: true})
+
             await axios.post(`${server}/signup`, {
                 nome: this.state.nome,
                 email: this.state.email,
@@ -48,9 +63,11 @@ class Auth extends Component {
                 confirmPassword: this.state.confirmPassword
             })
 
+            this.setState({loading: false})
             Alert.alert('Sucesso', 'Usuario cadastrado =)')
             this.setState({stageNew: false})
         } catch (err) {
+            this.setState({loading: false})
             showError(err)
         }
     }
@@ -108,8 +125,8 @@ class Auth extends Component {
                         value={this.state.confirmPassword} onChangeText={confirmPassword => this.setState({confirmPassword})}>
                     </AuthInput>}
 
-                    <TouchableOpacity onPress={this.signinOrSignup} disabled={!validForm}>
-                        <View style={[styles.button, !validForm ? {backgroundColor: '#AAA'} : {}]}>
+                    <TouchableOpacity onPress={this.signinOrSignup} disabled={!validForm || this.state.loading}>
+                        <View style={[styles.button, (!validForm || this.state.loading) ? {backgroundColor: '#AAA'} : {}]}>
                             <Text style={styles.buttonText}>
                                 {this.state.stageNew ? 'Registrar' : 'Entrar'}
                             </Text>
@@ -123,6 +140,14 @@ class Auth extends Component {
                         {this.state.stageNew ? 'Ja possui conta?' : 'Ainda nao possui conta?'}
                     </Text>
                 </TouchableOpacity>
+
+                {this.state.loading ? 
+                    <View style={styles.containerLoading}>
+                        <Loading/>
+                    </View>
+                    : null
+                }
+
             </ImageBackground>
         )
     }
@@ -138,7 +163,8 @@ const styles = StyleSheet.create({
     title: {
         fontFamily: commonStyles.fontFamily,
         color: '#FFF',
-        fontSize: 70
+        fontSize: 60,
+        fontWeight: 'bold'
     },
     subtitle: {
         fontFamily: commonStyles.fontFamily,
@@ -164,6 +190,15 @@ const styles = StyleSheet.create({
         fontFamily: commonStyles.fontFamily,
         color: '#FFF',
         fontSize: 20
+    },
+    containerLoading: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 })
 
