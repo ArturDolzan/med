@@ -13,8 +13,8 @@ import Loading from '../components/Loading'
 class Auth extends Component {
     state = {
         stageNew: false,
-        nome: '',
-        email: 'artur@teste.com.br',
+        nome: 'Artur',
+        email: 'artur@gmail.com',
         password: '1',
         confirmPassword: '',
         loading: false
@@ -56,8 +56,10 @@ class Auth extends Component {
         try{
             this.setState({loading: true})
 
+            console.log(`${server}/signup`)
+
             await axios.post(`${server}/signup`, {
-                nome: this.state.nome,
+                name: this.state.nome,
                 email: this.state.email,
                 password: this.state.password,
                 confirmPassword: this.state.confirmPassword
