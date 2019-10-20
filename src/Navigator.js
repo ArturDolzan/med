@@ -1,6 +1,6 @@
 import React from 'react'
 import {createSwitchNavigator, createAppContainer, createDrawerNavigator, 
-    createStackNavigator, createBottomTabNavigator} from 'react-navigation'
+    createStackNavigator, createBottomTabNavigator, Button} from 'react-navigation'
 import Agenda from './screens/Agenda';
 import Auth from './screens/Auth';
 import commonStyles from './commonStyles';
@@ -8,7 +8,7 @@ import Menu from './screens/Menu';
 import AuthOrApp from './screens/AuthOrApp';
 import AddPhoto from './screens/AddPhoto';
 import Icon from 'react-native-vector-icons/FontAwesome'
-import Maps from './screens/Maps';
+import Heart from './screens/Heart'
 
 
 const MenuRoutes = {
@@ -21,9 +21,9 @@ const MenuRoutes = {
     },
     Tomorrow: {
         name: 'Tomorrow',
-        screen: props => <Agenda title='Amanha' {...props} daysAhead={1}></Agenda>,
+        screen: props => <Agenda title='Amanhã' {...props} daysAhead={1}></Agenda>,
         navigationOptions: {
-            title: 'Amanha'
+            title: 'Amanhã'
         }
     },
     Week: {
@@ -35,9 +35,9 @@ const MenuRoutes = {
     },
     Month: {
         name: 'Month',
-        screen: props => <Agenda title='Mes' {...props} daysAhead={30}></Agenda>,
+        screen: props => <Agenda title='Mês' {...props} daysAhead={30}></Agenda>,
         navigationOptions: {
-            title: 'Mes'
+            title: 'Mês'
         }
     }
 }
@@ -46,6 +46,7 @@ const MenuRoutes = {
 const MenuConfig = {
     initialRouteName: 'Today',
     contentComponent: Menu,
+    unmountInactiveRoutes: true,
     contentOptions: {
         labelStyle: {
             fontFamily: commonStyles.fontFamily,
@@ -86,22 +87,13 @@ const bottomRoutes = {
                 <Icon name='home' size={30} color={color} />
         }
     },
-    Map: {
-        name: 'Map',
-        screen: Maps,
-        navigationOptions: {
-            title: 'Map',
-            tabBarIcon: ({ tintColor: color }) =>
-                <Icon name='map' size={30} color={color} />
-        }
-    },
     WhoAmI: {
         name: 'WhoAmI',
-        screen: Maps,
+        screen: Heart,
         navigationOptions: {
             title: 'WhoAmI',
             tabBarIcon: ({ tintColor: color }) =>
-                <Icon name='user' size={30} color={color} />
+                <Icon name='heart' size={30} color={color} />
         }
     }
 }
@@ -109,7 +101,7 @@ const bottomRoutes = {
 const bottomConfig = {
     initialRouteName: 'Home',
     tabBarOptions: {
-        showLabel: false,
+        showLabel: false
     }
 }
 

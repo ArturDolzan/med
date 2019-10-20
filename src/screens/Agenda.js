@@ -25,8 +25,10 @@ class Agenda extends Component {
 
     componentDidMount = () => {
         this.focusListener = this.props.navigation.addListener('didFocus', () => {
-            this.onFocusFunction()
+             this.onFocusFunction()
         })
+
+        this.onFocusFunction()
     }
 
     onFocusFunction = () => {
@@ -110,6 +112,7 @@ class Agenda extends Component {
 
                         <Text style={styles.subtitle}>
                             {moment().locale('pt-br').format('ddd, D [de] MMMM')}
+                            {/* {this.props.daysAhead} */}
                         </Text>
                     </View>
                 </ImageBackground>
@@ -123,9 +126,9 @@ class Agenda extends Component {
                             onPhoto={this.photo} loading={this.props.tasks.isLoadingImg} /> } />
                 
                 </View>
-                <ActionButton buttonColor={styleColor} onPress={() => this.toggleAddTask(true)}>
+                {/* <ActionButton buttonColor={styleColor} onPress={() => this.toggleAddTask(true)}>
 
-                </ActionButton>
+                </ActionButton> */}
                 
                 {this.props.tasks.isLoading ? 
                     <View style={styles.containerLoading}>
@@ -134,6 +137,16 @@ class Agenda extends Component {
                     : null
                 }
                 
+                <View style={[styles.addButtonContainer]}>
+                    <TouchableOpacity 
+                        style={[styles.addButton, {backgroundColor: styleColor, borderColor: styleColor}]} 
+                        onPress={() => this.toggleAddTask(true)}>
+                
+                        <Icon name={'plus'} size={40} color='white' />
+                            
+                    </TouchableOpacity>
+                </View>
+
             </View>
         )
     }
@@ -142,6 +155,20 @@ class Agenda extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1
+    },
+    addButtonContainer: {
+        flex: 1.2, 
+        alignContent: 'center', 
+        justifyContent: 'center', 
+        alignItems: 'center'
+    },
+    addButton: {
+        borderRadius:128,
+        borderWidth: 1,
+        width: 45,
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignContent: 'center'
     },
     containerLoading: {
         position: 'absolute',
@@ -153,7 +180,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     background: {
-        flex: 3
+        flex: 4
     },
     titleBar: {
         flex: 1,

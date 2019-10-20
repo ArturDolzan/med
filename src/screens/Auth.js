@@ -56,7 +56,7 @@ class Auth extends Component {
         try{
             this.setState({loading: true})
 
-            console.log(`${server}/signup`)
+            //console.log(`${server}/signup`)
 
             await axios.post(`${server}/signup`, {
                 name: this.state.nome,

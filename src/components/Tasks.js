@@ -51,6 +51,8 @@ export default props => {
     }
 
     let isLoading = props.loading || false
+
+    let currentDate = moment()
     
     return (
         <Swipeable leftActionActivationDistance={200} 
@@ -66,6 +68,13 @@ export default props => {
                     <View style={{paddingLeft: 5, paddingTop: 10}}>
                         <Text style={[styles.description, descStyle]}>{props.desc}</Text>
                         <Text style={styles.date}>{moment(props.estimateAt).locale('pt-br').format('ddd, D [de] MMMM [de] YYYY')}</Text>
+                        
+                        {currentDate.isAfter(moment(props.estimateAt), 'day') && !props.doneAt ?
+                            <Text style={styles.dateDelay}>Tarefa atrasada...</Text>
+                            :
+                            null
+                        }
+                        
                     </View>
                 </View>
                 <View style={styles.photo}>
@@ -160,6 +169,13 @@ const styles = StyleSheet.create({
     date: {
         fontFamily: commonStyles.fontFamily,
         color: commonStyles.colors.subText,
+        fontSize: 12
+    },
+
+    dateDelay: {
+        fontFamily: commonStyles.fontFamily,
+        color: 'red',
+        fontWeight: 'bold',
         fontSize: 12
     },
 

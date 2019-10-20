@@ -27,6 +27,7 @@ export default class AddTask extends Component {
             Alert.alert('Ops', 'Informe uma descricao para o lembrete')
             return
         }
+        
         const data = {...this.state}
         this.props.onSave(data)
 
