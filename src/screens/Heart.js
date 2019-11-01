@@ -17,7 +17,7 @@ class Heart extends Component {
 
                 <TouchableOpacity style={styles.button} onPress={() => this.clickTemQueVe()}>
                     <Text style={styles.title}>
-                        Tem que vê
+                        Me Aperte =)
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -35,11 +35,11 @@ const styles = StyleSheet.create({
     title: {
         fontFamily: commonStyles.fontFamily,
         color: 'white',
-        fontSize: 60,
+        fontSize: 48,
         fontWeight: 'bold'
     },
     button: {
-        backgroundColor: 'black',
+        backgroundColor: 'red',
         marginTop: 10,
         padding: 10,
         alignItems: 'center'

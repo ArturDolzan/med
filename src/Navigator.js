@@ -84,9 +84,10 @@ const bottomRoutes = {
         navigationOptions: {
             title: 'Home',
             tabBarIcon: ({ tintColor: color }) =>
-                <Icon name='home' size={30} color={color} />
+                <Icon name='tasks' size={30} color={color} />
         }
     },
+    
     WhoAmI: {
         name: 'WhoAmI',
         screen: Heart,
@@ -118,7 +119,7 @@ const MainRoutes = {
     },
     Home: {
         name: 'Home',
-        screen: bottomNavigator
+        screen: stackNavigator
     }
 }
 

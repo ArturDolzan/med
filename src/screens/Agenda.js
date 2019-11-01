@@ -137,15 +137,14 @@ class Agenda extends Component {
                     : null
                 }
                 
-                <View style={[styles.addButtonContainer]}>
+                 <View style={[styles.addButtonContainer]}>
                     <TouchableOpacity 
-                        style={[styles.addButton, {backgroundColor: styleColor, borderColor: styleColor}]} 
-                        onPress={() => this.toggleAddTask(true)}>
+                       onPress={() => this.toggleAddTask(true)}>
                 
-                        <Icon name={'plus'} size={40} color='white' />
+                        <Icon name={'plus'} size={40} color='green' />
                             
                     </TouchableOpacity>
-                </View>
+                </View> 
 
             </View>
         )
